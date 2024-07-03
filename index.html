@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEOM</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+        body {
+            margin: 0;
+            font-family: 'Amiri', serif; /* تغيير الخط لكل النصوص */
+            background-color: #f0f0f0;
+            display: flex;
+        }
+        header {
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 0px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .header-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #86a5b4, #555e70);
+        }
+        .logo {
+            height: 120px;
+            margin-right: 20px; /* مسافة بين اللوقو والنص */
+        }
+        .header-title {
+            font-size: 40px;
+            font-weight: bold;
+            color: rgb(0, 0, 0);
+            margin-right: auto; /* يضمن وجود النص في الطرف الآخر */
+        }
+        .sidebar {
+            width: 220px;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 13px 0 30px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 120px;
+            left: 0;
+            bottom: 0;
+            overflow: auto;
+        }
+        .sidebar h2 {
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            margin: 0;
+        }
+        .lock-icon {
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #ccc;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .sidebar-buttons {
+            margin-top: 20px;
+        }
+        .sidebar-buttons button {
+            width: 100%;
+            border: none;
+            background-color: transparent; /* خلفية شفافة للأزرار */
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 5px;
+            display: block;
+            transition: background-color 0.3s;
+            color: black; /* النص بالأسود */
+        }
+        .sidebar-buttons button:hover {
+            background-color: #ddd;
+        }
+        .content {
+            margin-left: 220px;
+            padding: 35px;
+            flex-grow: 1;
+            margin-top: 130px; /* لضمان عدم تداخل المحتوى مع الهيدر */
+            position: relative;
+        }
+        .full-screen-image, .full-screen-video {
+            width: 100%;
+            height: calc(100vh - 150px);
+            object-fit: cover;
+        }
+        .next-btn, .go-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #6c7c8d;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .next-btn:hover, .go-btn:hover {
+            background-color: #728daa;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        .quiz-question {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .quiz-options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .quiz-options li {
+            margin-bottom: 10px;
+        }
+        .quiz-options label {
+            font-size: 18px;
+        }
+        .quiz-options input {
+            margin-right: 10px;
+        }
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #7b8999;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #7d8d9e;
+        }
+        .result {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .result.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .result.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .slider-container {
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+        .slider-image {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+        .slider-image.active {
+            display: block;
+        }
+        .slider-caption {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background-color: #7d8d9e; /* خلفية زرقاء للتعليقات */
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .slider-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .slider-nav button {
+            background-color: #57668d;
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 10px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .slider-nav button:hover {
+            background-color: #7d8d9e;
+        }
+        .slider-nav button:hover {
+            background-color: #7d8d9e;
+        }
+        .text-box {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .map-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .map-buttons button {
+            background-color: #86a0bb;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .map-buttons button:hover {
+            background-color: #768faa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">NEOM</div>
+        <img src="llooggoo.png" alt="Logo" class="logo">
+        <div class="header-gradient"></div>
+    </header>
+    <div class="sidebar">
+        <h2>
+            Content List
+            <i class="fas fa-lock lock-icon" onclick="toggleSidebar()"></i>
+        </h2>
+        <div class="sidebar-buttons">
+            <button onclick="showPage('welcome')">welcome</button>
+            <div id="extra-buttons">
+                <button onclick="showPage('page2')">What is NEOM?</button>
+                <button onclick="showPage('page3')">NEOM is</button>
+                <button onclick="showPage('page4')">About NEOM</button>
+                <button onclick="showPage('page5')">guess!</button>
+                <button onclick="showPage('page6')">Regions</button>
+                <button onclick="showPage('page7')">NEOM map</button>
+                <button onclick="showPage('page8')">guess!</button>
+                <button onclick="showPage('page9')">The Line</button>
+                <button onclick="showPage('page10')">Oxagon</button>
+                <button onclick="showPage('page11')">Trojena</button>
+                <button onclick="showPage('page12')">Sindalah</button>
+                <button onclick="showPage('page13')">Maqna</button>
+                <button onclick="showPage('page14')">You are in NEOM</button>
+                <button onclick="showPage('page15')">guess!!</button>
+                <button onclick="showPage('page16')">Thank You</button>
+            </div>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <!-- محتوى الصفحات سيتم عرضه هنا -->
+    </div>
+
+    <script>
+        const imagesYouAreInNeom = [
+            {src: "666.jpeg", caption: "THE LINE "},
+            {src: "222.jpeg", caption: "SINDALAH"},
+            {src: "333.jpeg", caption: "OXAGON"},
+            {src: "4444.jpeg", caption: "XAYNOR"},
+            {src: "555.jpeg", caption: "NORLANA"},
+            {src: "111.jpeg", caption: "THE LINE"}
+        ];
+
+        const imagesNeomAreas = [
+            {src: "11.jpeg", caption: "Marine Areas"},
+            {src: "22.jpeg", caption: "Lower Desert"},
+            {src: "33.jpeg", caption: "Mountain"},
+            {src: "44.jpeg", caption: " Upper valley"}
+        ];
+
+        const imagesNeomMap = [
+            "photo1719975517.jpeg",
+            "photo1719975517 (1).jpeg",
+            "photo1719975517 (2).jpeg",
+            "photo1719975517 (3).jpeg", 
+            "photo1719975517 (5).jpeg",
+            "photo1719975517 (4).jpeg",
+        ];
+
+        let currentIndex = 0;
+
+        function showPage(page) {
+            const content = document.getElementById('content');
+            if (page === 'welcome') {
+                content.innerHTML = `
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="IMG_2776.MP4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="next-btn" onclick="showPage('page2')">Next</button>
+                `;
+            } else if (page === 'page2') {
+                content.innerHTML = `
+                    <h1>What is NEOM?</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="what-is-neom.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="next-btn" onclick="showPage('page3')">Next</button>
+                `;
+            } else if (page === 'page3') {
+                content.innerHTML = `
+                    <h1>NEOM is</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="neom-is.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="next-btn" onclick="showPage('page4')">Next</button>
+                `;
+            } else if (page === 'page4') {
+                content.innerHTML = `
+                    <h1>About NEOM</h1>
+                    <div class="text-box">
+                        <p>NEOM is a visionary project located in the northwestern region of Saudi Arabia, designed to create a new model for urban living and sustainable development. The project aims to blend advanced technology with natural landscapes, fostering innovation and economic growth. Here are key highlights of NEOM:</p>
+                        <ul>
+                            <li><strong>Location:</strong> NEOM is situated in the Tabuk Province, bordered by the Red Sea and close to the Suez Canal, making it strategically important for global trade.</li>
+                            <li><strong>Vision:</strong> The project is part of Saudi Arabia's Vision 2030, which seeks to diversify the economy and reduce dependence on oil. NEOM aims to be a hub for technological and environmental innovation, attracting investments in various sectors such as energy, biotechnology, and food production.</li>
+                            <li><strong>Sustainability:</strong> NEOM is committed to sustainability, with plans to be powered entirely by renewable energy sources. The city will implement cutting-edge green technologies and sustainable practices in its infrastructure and operations.</li>
+                            <li><strong>Smart City:</strong> As a smart city, NEOM will leverage AI, IoT, and other advanced technologies to enhance the quality of life for its residents. This includes autonomous transportation, smart health services, and efficient energy management systems.</li>
+                            <li><strong>Lifestyle:</strong> NEOM promises a unique lifestyle experience, combining modern urban amenities with pristine natural environments. The project includes plans for luxury resorts, entertainment venues, and cultural attractions, aiming to become a global destination for tourism and leisure.</li>
+                            <li><strong>Economic Opportunities:</strong> By fostering innovation and attracting global talent, NEOM aims to create significant economic opportunities. It will provide a fertile ground for startups, research institutions, and multinational corporations to thrive.</li>
+                        </ul>
+                        <p>In summary, NEOM represents a bold step towards the future, integrating cutting-edge technology, sustainable practices, and visionary urban planning to create a model city that inspires the world.</p>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page5')">Next</button>
+                `;
+            } else if (page === 'page5') {
+                content.innerHTML = `
+                    <div class="quiz-container">
+                        <div class="quiz-question">When was the launch of the NEOM city project announced?</div>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="quiz" value="2011"> 2011</label></li>
+                            <li><label><input type="radio" name="quiz" value="2009"> 2009</label></li>
+                            <li><label><input type="radio" name="quiz" value="2017"> 2017</label></li>
+                        </ul>
+                        <button class="submit-btn" onclick="submitQuiz('2017')">Submit</button>
+                        <div id="result" class="result"></div>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page6')">Next</button>
+                `;
+            } else if (page === 'page6') {
+                content.innerHTML = `
+                    <div class="slider-container">
+                        <div class="slider-caption">${imagesNeomAreas[0].caption}</div>
+                        ${imagesNeomAreas.map((img, index) => `<img src="${img.src}" alt="Image ${index + 1}" class="slider-image ${index === 0 ? 'active' : ''}">`).join('')}
+                        <div class="slider-nav">
+                            <button onclick="prevImage(imagesNeomAreas)"><</button>
+                            <button onclick="nextImage(imagesNeomAreas)">></button>
+                        </div>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page7')">Next</button>
+                `;
+            } else if (page === 'page7') {
+                content.innerHTML = `
+                    <h1 style="text-align: center;">NEOM MAP</h1>
+                    <div class="map-container">
+                        <div class="map-buttons">
+                            <button onclick="changeMapImage(0)">OXAGON</button>
+                            <button onclick="changeMapImage(1)">SINDALAH</button>
+                            <button onclick="changeMapImage(2)">THE LINE</button>
+                            <button onclick="changeMapImage(3)">MAGNA</button>
+                            <button onclick="changeMapImage(4)">TROJENA</button>
+                            <button onclick="changeMapImage(5)">ALL</button>
+                        </div>
+                        <img id="neomMapImage" src="${imagesNeomMap[5]}" alt="NEOM Map" style="display: block; margin: auto; max-width: 60%; margin-top: 10px;">
+                    </div>
+                    <button class="next-btn" onclick="showPage('page8')">Next</button>
+                `;
+            } else if (page === 'page8') {
+                content.innerHTML = `
+                    <div class="quiz-container">
+                        <div class="quiz-question">How many regions does NEOM have?</div>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="quiz" value="3"> 3</label></li>
+                            <li><label><input type="radio" name="quiz" value="4"> 4</label></li>
+                            <li><label><input type="radio" name="quiz" value="5"> 5</label></li>
+                        </ul>
+                        <button class="submit-btn" onclick="submitQuiz('5')">Submit</button>
+                        <div id="result" class="result"></div>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page9')">Next</button>
+                `;
+            } else if (page === 'page9') {
+                content.innerHTML = `
+                    <h1>The Line</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="theline.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="go-btn" onclick="showText('The Line', 'This is a description of The Line video.')">Go</button>
+                    <button class="next-btn" onclick="showPage('page10')">Next</button>
+                `;
+            } else if (page === 'page10') {
+                content.innerHTML = `
+                    <h1>Oxagon</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="ox.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="go-btn" onclick="showText('Oxagon', 'This is a description of Oxagon video.')">Go</button>
+                    <button class="next-btn" onclick="showPage('page11')">Next</button>
+                `;
+            } else if (page === 'page11') {
+                content.innerHTML = `
+                    <h1>Trojena</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="tro.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="go-btn" onclick="showText('Trojena', 'This is a description of Trojena video.')">Go</button>
+                    <button class="next-btn" onclick="showPage('page12')">Next</button>
+                `;
+            } else if (page === 'page12') {
+                content.innerHTML = `
+                    <h1>Sindalah</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="si.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="go-btn" onclick="showText('Sindalah', 'This is a description of Sindalah video.')">Go</button>
+                    <button class="next-btn" onclick="showPage('page13')">Next</button>
+                `;
+            } else if (page === 'page13') {
+                content.innerHTML = `
+                    <h1>Maqna</h1>
+                    <video class="full-screen-video" autoplay loop controls>
+                        <source src="magna.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="go-btn" onclick="showText('Maqna', 'This is a description of Maqna video.')">Go</button>
+                    <button class="next-btn" onclick="showPage('page14')">Next</button>
+                `;
+            } else if (page === 'page14') {
+                content.innerHTML = `
+                    <div class="slider-container">
+                        <div class="slider-caption">${imagesYouAreInNeom[0].caption}</div>
+                        ${imagesYouAreInNeom.map((img, index) => `<img src="${img.src}" alt="Image ${index + 1}" class="slider-image ${index === 0 ? 'active' : ''}">`).join('')}
+                        <div class="slider-nav">
+                            <button onclick="prevImage(imagesYouAreInNeom)"><</button>
+                            <button onclick="nextImage(imagesYouAreInNeom)">></button>
+                        </div>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page15')">Next</button>
+                `;
+            } else if (page === 'page15') {
+                content.innerHTML = `
+                    <div class="quiz-container">
+                        <div class="quiz-question">What are the three pillars upon which the NEOM project is based?</div>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="quiz" value="Technology, Energy, Environment"> Technology, Energy, Environment</label></li>
+                            <li><label><input type="radio" name="quiz" value="Health, Education, Security"> Health, Education, Security</label></li>
+                            <li><label><input type="radio" name="quiz" value="Sustainability, Innovation, Mobility"> Sustainability, Innovation, Mobility</label></li>
+                        </ul>
+                        <button class="submit-btn" onclick="submitQuiz('Sustainability, Innovation, Mobility')">Submit</button>
+                        <div id="result" class="result"></div>
+                    </div>
+                    <button class="next-btn" onclick="showPage('page16')">Next</button>
+                `;
+            } else if (page === 'page16') {
+                content.innerHTML = `
+                    <h1>Thank You</h1>
+                    <div class="text-box">
+                        <p>Thank you. I hope this overview is informative and enjoyable. We hope you visit us soon in NEOM.</p>
+                    </div>
+                `;            }
+        }
+
+        function showText(title, text) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div style="background-color: #f0f0f0; padding: 20px; border-radius: 10px;">
+                    <h1>${title}</h1>
+                    <p>${text}</p>
+                </div>
+                <button class="next-btn" onclick="showNextPage()">Next</button>
+            `;
+        }
+
+        function showNextPage() {
+            const nextPage = getNextPage();
+            showPage(nextPage);
+        }
+
+        function getNextPage() {
+            const pages = [
+                'welcome', 'page2', 'page3', 'page4', 'page5', 'page6', 'page7', 'page8', 
+                'page9', 'page10', 'page11', 'page12', 'page13', 'page14', 'page15', 'page16'
+            ];
+            const currentPage = document.querySelector('.next-btn').onclick.toString().match(/showPage\('(.+?)'\)/)[1];
+            const currentIndex = pages.indexOf(currentPage);
+            return pages[(currentIndex + 1) % pages.length];
+        }
+
+        function submitQuiz(correctAnswer) {
+            const result = document.getElementById('result');
+            const selectedOption = document.querySelector('input[name="quiz"]:checked');
+            if (selectedOption) {
+                if (selectedOption.value === correctAnswer) {
+                    result.textContent = 'Correct Answer Excellent!';
+                    result.className = 'result correct';
+                } else {
+                    result.textContent = 'Incorrect Answer Try Again';
+                    result.className = 'result incorrect';
+                }
+                result.style.display = 'block';
+            } else {
+                alert('Please select an answer');
+            }
+        }
+
+        function toggleSidebar() {
+            const extraButtons = document.getElementById('extra-buttons');
+            if (extraButtons.style.display === 'none') {
+                extraButtons.style.display = 'block';
+            } else {
+                extraButtons.style.display = 'none';
+            }
+        }
+
+        function prevImage(images) {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+            showImage(images);
+        }
+
+        function nextImage(images) {
+            currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+            showImage(images);
+        }
+
+        function showImage(images) {
+            const sliderImages = document.querySelectorAll('.slider-image');
+            sliderImages.forEach((img, index) => {
+                img.classList.toggle('active', index === currentIndex);
+            });
+            document.querySelector('.slider-caption').textContent = images[currentIndex].caption;
+        }
+
+        function changeMapImage(index) {
+            const mapImage = document.getElementById('neomMapImage');
+            mapImage.src = imagesNeomMap[index];
+        }
+
+        // عرض الأزرار الإضافية بشكل افتراضي
+        document.getElementById('extra-buttons').style.display = 'none';
+        // عرض الصفحة الافتراضية
+        showPage('welcome');
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</body>
+</html>
